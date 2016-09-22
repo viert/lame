@@ -1,5 +1,7 @@
 package lame
 
+// http://www.leidinger.net/lame/doxy/html/lame_8h-source.html
+
 /*
 #cgo LDFLAGS: -lmp3lame
 #include "lame/lame.h"
@@ -21,6 +23,12 @@ const (
 	NOT_SET       = C.NOT_SET
 	MAX_INDICATOR = C.MAX_INDICATOR
 	BIT_DEPTH     = 16
+
+	VBR_OFF = C.vbr_off
+	VBR_RH = C.vbr_rh
+	VBR_ABR = C.vbr_abr
+	VBR_MTRH = C.vbr_mtrh
+	VBR_DEFAULT = C.vbr_default
 )
 
 type Encoder struct {
@@ -34,6 +42,23 @@ func Init() *Encoder {
 	encoder := &Encoder{handle, make([]byte, 0), false}
 	runtime.SetFinalizer(encoder, finalize)
 	return encoder
+}
+
+func (e *Encoder) SetVBR(mode C.vbr_mode) {
+	C.lame_set_VBR(e.handle, mode)
+}
+
+func (e *Encoder) SetVBRAverageBitRate(averageBitRate int) {
+	C.lame_set_VBR_mean_bitrate_kbps(e.handle, C.int(averageBitRate))
+}
+
+func (e *Encoder) SetVBRQuality(quality int) {
+	C.lame_set_VBR_q(e.handle, C.int(quality))
+}
+
+func (e *Encoder) SetLowPassFrequency(frequency int) {
+	// Frequency in kHz
+	C.lame_set_lowpassfreq(e.handle, C.int(frequency))
 }
 
 func (e *Encoder) SetNumChannels(num int) {
@@ -54,6 +79,14 @@ func (e *Encoder) SetMode(mode C.MPEG_mode) {
 
 func (e *Encoder) SetQuality(quality int) {
 	C.lame_set_quality(e.handle, C.int(quality))
+}
+
+func (e *Encoder) InitId3Tag() {
+	C.id3tag_init(e.handle)
+}
+
+func (e *Encoder) ID3TagAddV2() {
+	C.id3tag_add_v2(e.handle)
 }
 
 func (e *Encoder) InitParams() int {
@@ -113,13 +146,26 @@ func (e *Encoder) Encode(buf []byte) []byte {
 	cBuf := (*C.short)(unsafe.Pointer(&buf[0]))
 	cOut := (*C.uchar)(unsafe.Pointer(&out[0]))
 
-	bytesOut := C.int(C.lame_encode_buffer_interleaved(
-		e.handle,
-		cBuf,
-		C.int(numSamples),
-		cOut,
-		C.int(estimatedSize),
-	))
+	var bytesOut C.int
+
+	if e.NumChannels() == 1 {
+		bytesOut = C.int(C.lame_encode_buffer(
+			e.handle,
+			cBuf,
+			nil,
+			C.int(numSamples),
+			cOut,
+			C.int(estimatedSize),
+		))
+	} else {
+		bytesOut = C.int(C.lame_encode_buffer_interleaved(
+			e.handle,
+			cBuf,
+			C.int(numSamples),
+			cOut,
+			C.int(estimatedSize),
+		))
+	}
 	return out[0:bytesOut]
 
 }
