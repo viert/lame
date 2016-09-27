@@ -29,6 +29,8 @@ const (
 	VBR_ABR = C.vbr_abr
 	VBR_MTRH = C.vbr_mtrh
 	VBR_DEFAULT = C.vbr_default
+
+	MAX_FRAME_SIZE = 2880
 )
 
 type Encoder struct {
@@ -85,8 +87,23 @@ func (e *Encoder) InitId3Tag() {
 	C.id3tag_init(e.handle)
 }
 
+func (e *Encoder) SetWriteId3tagAutomatic(automaticWriteTag int) {
+	C.lame_set_write_id3tag_automatic(e.handle, C.int(automaticWriteTag))
+}
+
 func (e *Encoder) ID3TagAddV2() {
 	C.id3tag_add_v2(e.handle)
+}
+
+func (e *Encoder) SetbWriteVbrTag(writeVbrTag int) {
+	C.lame_set_bWriteVbrTag(e.handle, C.int(writeVbrTag))
+}
+
+func (e *Encoder) GetLametagFrame() []byte {
+	tagFrame := make([]byte, MAX_FRAME_SIZE)
+	tagFrameLen := C.lame_get_lametag_frame(e.handle, (*C.uchar)(unsafe.Pointer(&tagFrame[0])), C.size_t(len(tagFrame)))
+
+	return tagFrame[0:tagFrameLen]
 }
 
 func (e *Encoder) InitParams() int {
