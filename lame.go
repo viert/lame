@@ -57,7 +57,7 @@ func (e *Encoder) SetVBRQuality(quality int) {
 }
 
 func (e *Encoder) SetLowPassFrequency(frequency int) {
-	// Frequency in kHz
+	// Frequency in Hz
 	C.lame_set_lowpassfreq(e.handle, C.int(frequency))
 }
 
