@@ -11,7 +11,7 @@ import (
 	"unsafe"
 )
 
-type Handle *[0]byte
+type Handle *C.struct_lame_global_struct
 
 const (
 	STEREO        = C.STEREO
