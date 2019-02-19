@@ -33,6 +33,31 @@ const (
 	MAX_FRAME_SIZE = 2880
 )
 
+const (
+  ABR_8   = C.ABR_8
+  ABR_320 = C.ABR_320
+  V9      = C.V9
+  VBR_10  = C.VBR_10
+  V8      = C.V8
+  VBR_20  = C.VBR_20
+  V7      = C.V7
+  VBR_30  = C.VBR_30
+  V6      = C.V6
+  VBR_40  = C.VBR_40
+  V5      = C.V5
+  VBR_50  = C.VBR_50
+  V4      = C.V4
+  VBR_60  = C.VBR_60
+  V3      = C.V3
+  VBR_70  = C.VBR_70
+  V2      = C.V2
+  VBR_80  = C.VBR_80
+  V1      = C.V1
+  VBR_90  = C.VBR_90
+  V0      = C.V0
+  VBR_100 = C.VBR_100
+)
+
 type Encoder struct {
 	handle    Handle
 	remainder []byte
