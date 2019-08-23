@@ -3,6 +3,8 @@ lame
 
 Simple libmp3lame powered mp3 encoder for Go
 
+**Note:** this project is obsolete, consider moving to https://github.com/viert/go-lame
+
 Example:
 
 ```Go
